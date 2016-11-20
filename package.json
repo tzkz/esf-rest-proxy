@@ -1,0 +1,11 @@
+{
+  "name": "esf-proxy",
+  "version": "1.0.0",
+  "description": "RESTful API proxy for ESF SOAP API",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Timur Z",
+  "license": "ISC"
+}
