@@ -1,0 +1,6 @@
+/node_modules
+/dummy_data
+.DS_Store
+/env/config.json
+*.log
+*.pdf
