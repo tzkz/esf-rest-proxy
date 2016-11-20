@@ -4,3 +4,5 @@
 /env/config.json
 *.log
 *.pdf
+*.swp
+
