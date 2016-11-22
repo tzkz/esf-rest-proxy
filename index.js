@@ -85,10 +85,13 @@ Promise.all([p1, p2])
     invoiceSoapClient = values[0];
     sessionSoapClient = values[1];
     app.listen(port, () => {
+      app.emit('appStarted');
       console.log('Listening on port:', port);
     });
   })
   .catch((error) => {
     throw error;
   });
+
+module.exports = app;
 
