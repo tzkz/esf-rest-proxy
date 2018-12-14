@@ -19,7 +19,7 @@ x509Certificate | User's X.509 certificate | Text
 #### Example Request
 
 ```
-curl -X POST "https://getesf.com/api/v1/sessions/create" \
+curl -X POST "https://getesf.com/api/v1/sessions/getuser" \
      -H "Content-Type: application/json" \
      -d '{ 
           "username": "123456789011",
