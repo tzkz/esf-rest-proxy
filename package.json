@@ -9,12 +9,12 @@
   "author": "Timur Z",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
-    "soap": "^0.17.0"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "soap": "^0.25.0"
   },
   "devDependencies": {
-    "mocha": "^3.1.2",
-    "supertest": "^2.0.1"
+    "mocha": "^5.2.0",
+    "supertest": "^3.3.0"
   }
 }
