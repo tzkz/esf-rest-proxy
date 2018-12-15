@@ -1,6 +1,6 @@
 # esf-rest-proxy
 
-RESTful proxy for ESF SOAP API. Original WSDLs: https://esf-test.kgd.gov.kz:9443/esf-web/ws/
+RESTful proxy for ESF SOAP API. Original WSDLs: https://testvs.kgd.gov.kz:8443/esf-web/ws/api1/
 
 ## Session Service
 
