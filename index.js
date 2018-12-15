@@ -1,7 +1,7 @@
 const express = require('express');
 const soap = require('soap');
 const bodyParser = require('body-parser');
-const config = require('./env/config');
+const config = require('./config');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,8 +38,8 @@ app.post('/sessions', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
  
   let soapReqBody = {
-    tin: req.body.tin,
-    x509Certificate: req.get('X-Client-Cert')
+    tin: req.body.username,
+    x509Certificate: req.body.x509Certificate,
   };
 	
   sessionSoapClient.createSession(soapReqBody, function(err, result) {
@@ -52,8 +52,8 @@ app.post('/users', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
   
   let soapReqBody = {
-    tin: req.body.tin,
-    x509Certificate: req.get('X-Client-Cert')
+    tin: req.body.username,
+    x509Certificate: req.body.x509Certificate,
   };
 
   sessionSoapClient.getUser(soapReqBody, function(err, result) {
