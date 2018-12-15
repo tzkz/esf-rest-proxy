@@ -7,7 +7,7 @@ RESTful proxy for ESF SOAP API. Original WSDLs: https://testvs.kgd.gov.kz:8443/e
 ### Create Session
 
 ```
-POST /sessions/create
+POST /sessions/createsession
 ```
 
 Field | Description | Format
@@ -19,7 +19,7 @@ x509Certificate | User's X.509 certificate | Text
 #### Example Request
 
 ```
-curl -X POST "https://getesf.com/api/v1/sessions/create" \
+curl -X POST "localhost:3000/sessions/createsession" \
      -H "Content-Type: application/json" \
      -d '{ 
           "username": "123456789011",
@@ -32,20 +32,119 @@ curl -X POST "https://getesf.com/api/v1/sessions/create" \
 
 ```
 {
-  "sessionId": "518c8ad6b28843b29e8a41f798ff4703-123456789011-"
+    "sessionId": "518c8ad6b28843b29e8a41f798ff4703-123456789011-"
 }
 ```
 
 ### Current User
 
 ```
-POST /sessions/getuser
+POST /sessions/currentuser
 ```
 
-### Close Session
+Field | Description | Format
+----- | ----------- | ------
+username | User's IIN or BIN | Text
+password | ESF account password | Text
+sessionId | Session ID | Text
+
+#### Example Request
 
 ```
-POST /sessions/close
+curl -X POST "localhost:3000/sessions/currentuser" \
+     -H "Content-Type: application/json" \
+     -d '{ 
+          "username": "123456789011",
+          "password": "TestPass123",
+          "sessionId": "cf919a520f9c41d4a41f4deba060c39d-123456789011-"
+        }'
+```
+
+#### Example Response
+
+```
+{
+    "user": {
+        "login": "123456789011",
+        "email": "i.lucenko@osdkz.com",
+        "mobile": "454545",
+        "issueDate": "03.12.2018",
+        "issuedBy": "fdfdff",
+        "passportNum": "232323",
+        "status": "ACTIVE",
+        "reason": "",
+        "taxpayer": {
+            "tin": "123456789011",
+            "nameRu": "ИП Кайрат",
+            "firstNameRu": "test",
+            "addressRu": "010000, Казахстан, г. Астана, ул. Мира 4",
+            "resident": true,
+            "type": "INDIVIDUAL_ENTREPRENEUR",
+            "resourceUser": false,
+            "accounts": null,
+            "kogd": "0001"
+        }
+    }
+}
+```
+
+### Current User Profiles
+
+```
+POST /sessions/currentuserprofiles
+```
+
+Field | Description | Format
+----- | ----------- | ------
+username | User's IIN or BIN | Text
+password | ESF account password | Text
+sessionId | Session ID | Text
+
+#### Example Request
+
+```
+curl -X POST "localhost:3000/sessions/currentuserprofiles" \
+     -H "Content-Type: application/json" \
+     -d '{ 
+          "username": "123456789011",
+          "password": "TestPass123",
+          "sessionId": "cf919a520f9c41d4a41f4deba060c39d-123456789011-"
+        }'
+```
+
+#### Example Response
+
+```
+{
+    "profileInfoList": {
+        "profileInfo": [
+            {
+                "iin": "123456789011",
+                "tin": "123456789011",
+                "businessProfileType": "INDIVIDUAL",
+                "status": "ACTIVE",
+                "type": "GENERAL"
+            },
+            {
+                "iin": "123456789011",
+                "tin": "123456789011",
+                "businessProfileType": "ENTREPRENEUR",
+                "status": "ACTIVE",
+                "type": "GENERAL"
+            },
+            {
+                "iin": "123456789011",
+                "tin": "123456789011",
+                "businessProfileType": "PROJECT_ADMIN",
+                "status": "ACTIVE",
+                "type": "PROJECT",
+                "projectParticipantType": "CONTRACTOR",
+                "projectCode": "2898776207527002111",
+                "projectName": "test esf-513(13.12.2018)"
+            }
+        ]
+    }
+}
 ```
 
 ## Invoice Service
