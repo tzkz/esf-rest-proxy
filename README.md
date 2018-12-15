@@ -7,7 +7,7 @@ RESTful proxy for ESF SOAP API. Original WSDLs: https://esf-test.kgd.gov.kz:9443
 ### Create Session
 
 ```
-POST /sessions/getuser
+POST /sessions/create
 ```
 
 Field | Description | Format
