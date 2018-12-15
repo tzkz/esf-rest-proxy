@@ -4,7 +4,7 @@ RESTful proxy for ESF SOAP API. Original WSDLs: https://esf-test.kgd.gov.kz:9443
 
 ## Session Service
 
-### Get User
+### Create Session
 
 ```
 POST /sessions/getuser
@@ -19,7 +19,7 @@ x509Certificate | User's X.509 certificate | Text
 #### Example Request
 
 ```
-curl -X POST "https://getesf.com/api/v1/sessions/getuser" \
+curl -X POST "https://getesf.com/api/v1/sessions/create" \
      -H "Content-Type: application/json" \
      -d '{ 
           "username": "123456789011",
@@ -32,13 +32,14 @@ curl -X POST "https://getesf.com/api/v1/sessions/getuser" \
 
 ```
 {
+  "sessionId": "518c8ad6b28843b29e8a41f798ff4703-123456789011-"
 }
 ```
 
-### Create Session
+### Current User
 
 ```
-POST /sessions/create
+POST /sessions/getuser
 ```
 
 ### Close Session
