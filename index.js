@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 
 app.get('/invoices', (req, res) => { res.send('GET /invoices'); });
 
-app.post('/sessions', (req, res) => {
+app.post('/sessions/createsession', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
  
   let soapReqBody = {
@@ -48,15 +48,27 @@ app.post('/sessions', (req, res) => {
   }, {rejectUnauthorized: false});
 });
 
-app.post('/users', (req, res) => { 
+app.post('/sessions/currentuser', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
-  
+
   let soapReqBody = {
-    tin: req.body.username,
-    x509Certificate: req.body.x509Certificate,
+    sessionId: req.body.sessionId,
   };
 
-  sessionSoapClient.getUser(soapReqBody, function(err, result) {
+  sessionSoapClient.currentUser(soapReqBody, function(err, result) {
+    if (err) { return res.send(err); }
+    res.json(result);
+  }, {rejectUnauthorized: false});
+});
+
+app.post('/sessions/currentuserprofiles', (req, res) => {
+  setSoapSecurity(req.body.username, req.body.password);
+
+  let soapReqBody = {
+    sessionId: req.body.sessionId,
+  };
+
+  sessionSoapClient.currentUserProfiles(soapReqBody, function(err, result) {
     if (err) { return res.send(err); }
     res.json(result);
   }, {rejectUnauthorized: false});
