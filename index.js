@@ -1,19 +1,20 @@
 const express = require('express');
 const soap = require('soap');
 const bodyParser = require('body-parser');
+const xml2js = require('xml2js');
 const config = require('./config');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const wsdlOptions = {
-    overrideRootElement: {
-        namespace: 'tns'
-    },
-    ignoredNamespaces: {
-      namespaces: [],
-      override: true
-    },
-    ignoreBaseNameSpaces: false
+    // overrideRootElement: {
+    //     namespace: 'tns'
+    // },
+    // ignoredNamespaces: {
+    //   namespaces: [],
+    //   override: true
+    // },
+    // ignoreBaseNameSpaces: false
 };
 let invoiceSoapClient = null;
 let sessionSoapClient = null;
@@ -32,7 +33,25 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/invoices', (req, res) => { res.send('GET /invoices'); });
+app.get('/invoices/queryinvoice', (req, res) => {
+  const dateFrom = new Date(req.query.dateFrom)
+  const dateTo = new Date(req.query.dateTo)
+  let soapReqBody = {
+    sessionId: req.get('Session-ID'),
+    criteria: {
+      direction: req.query.direction,
+      dateFrom: dateFrom.toISOString(),
+      dateTo: dateTo.toISOString(),
+      asc: true,
+    }
+  }
+
+  invoiceSoapClient.queryInvoice(soapReqBody, (error, result) => {
+    if (error) { return res.send(error) }
+
+    res.json(result)
+  }, {rejectUnauthorized: false})
+});
 
 app.post('/sessions/createsession', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
