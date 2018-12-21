@@ -157,6 +157,36 @@ curl -X POST "localhost:3000/sessions/currentuserprofiles" \
 }
 ```
 
+### Close Session
+
+```
+POST /sessions/closesession
+```
+
+Field | Description | Format
+----- | ----------- | ------
+username | User's IIN or BIN | Text
+password | ESF account password | Text
+sessionId | Session ID | Text
+
+#### Example Request
+
+```
+curl -X POST "localhost:3000/sessions/closesession" \
+     -H "Content-Type: application/json" \
+     -d '{ 
+          "sessionId": "cf919a520f9c41d4a41f4deba060c39d-123456789011-"
+        }'
+```
+
+#### Example Response
+
+```
+{
+    "status": "CLOSED"
+}
+```
+
 ## Invoice Service
 
 ### Query Invoice

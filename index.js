@@ -68,6 +68,19 @@ app.post('/sessions/createsession', (req, res) => {
   }, {rejectUnauthorized: false});
 });
 
+app.post('/sessions/closesession', (req, res) => {
+  setSoapSecurity(req.body.username, req.body.password);
+ 
+  let soapReqBody = {
+    sessionId: req.body.sessionId,
+  };
+	
+  sessionSoapClient.closeSession(soapReqBody, function(err, result) {
+    if (err) { return res.send(err); }
+    res.json(result);
+  }, {rejectUnauthorized: false});
+});
+
 app.post('/sessions/currentuser', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
 
