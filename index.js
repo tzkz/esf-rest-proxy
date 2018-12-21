@@ -61,9 +61,12 @@ app.post('/sessions/createsession', (req, res) => {
     tin: req.body.username,
     x509Certificate: req.body.x509Certificate,
   };
-	
+
   sessionSoapClient.createSession(soapReqBody, function(err, result) {
-    if (err) { return res.send(err); }
+    if (err) {
+      return res.status(err.response.statusCode)
+        .json({ ...err, error: err.root.Envelope.Body.Fault });
+    }
     res.json(result);
   }, {rejectUnauthorized: false});
 });
@@ -74,7 +77,7 @@ app.post('/sessions/closesession', (req, res) => {
   let soapReqBody = {
     sessionId: req.body.sessionId,
   };
-	
+
   sessionSoapClient.closeSession(soapReqBody, function(err, result) {
     if (err) { return res.send(err); }
     res.json(result);
