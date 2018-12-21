@@ -175,6 +175,8 @@ sessionId | Session ID | Text
 curl -X POST "localhost:3000/sessions/closesession" \
      -H "Content-Type: application/json" \
      -d '{ 
+          "username": "123456789011",
+          "password": "TestPass123",
           "sessionId": "cf919a520f9c41d4a41f4deba060c39d-123456789011-"
         }'
 ```
