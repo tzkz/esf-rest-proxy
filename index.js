@@ -1,7 +1,7 @@
 const express = require('express');
 const soap = require('soap');
 const bodyParser = require('body-parser');
-const xml2js = require('xml2js');
+const cors = require('cors');
 const config = require('./config');
 
 const app = express();
@@ -26,6 +26,7 @@ const setSoapSecurity = (user, pass) => {
   })); 
 };
 
+app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
