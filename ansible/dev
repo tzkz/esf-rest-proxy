@@ -1,0 +1,7 @@
+[api]
+52.52.165.140
+
+[api:vars]
+ansible_user=ubuntu
+www_root=~/www/esfapidev/
+service_name=esf-api-dev

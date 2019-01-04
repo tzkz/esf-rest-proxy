@@ -1,0 +1,34 @@
+- hosts: api
+  tasks:
+  - name: Install nvm
+    shell: >
+      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+    args:
+      executable: /bin/bash
+      chdir: "{{ ansible_env.HOME }}"
+      creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+  - name: Install node
+    shell: >
+      . {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install 10.15.0
+    args:
+      executable: /bin/bash
+      chdir: "{{ ansible_env.HOME }}"
+
+  - name: Clone repo
+    git:
+      repo: 'https://github.com/timurengineer/esf-rest-proxy.git'
+      dest: '{{ www_root }}'
+
+  - name: Install npm packages
+    npm:
+      path={{ www_root }}
+
+  - name: Delete old pm2 process
+    command: pm2 delete {{ service_name }}
+    ignore_errors: yes
+
+  - name: Start pm2
+    command: pm2 start index.js --name {{ service_name }} --interpreter={{ ansible_env.HOME }}/.nvm/versions/node/v10.15.0/bin/node
+    args:
+      chdir: "{{ www_root }}"
