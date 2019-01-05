@@ -10,19 +10,26 @@
 
   - name: Install node
     shell: >
-      . {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install 10.15.0
+      . {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install v10.15.0
     args:
       executable: /bin/bash
       chdir: "{{ ansible_env.HOME }}"
+      creates: "{{ ansible_env.HOME }}/.nvm/versions/node/v10.15.0"
 
-  - name: Clone repo
-    git:
-      repo: 'https://github.com/timurengineer/esf-rest-proxy.git'
-      dest: '{{ www_root }}'
+  - name: Copy files
+    synchronize:
+      archive: yes
+      recursive: yes
+      delete: yes
+      src: ../../esf-rest-proxy/
+      dest: "{{ www_root }}"
+      rsync_opts:
+        - "--exclude=node_modules"
 
   - name: Install npm packages
     npm:
-      path={{ www_root }}
+      path: "{{ www_root }}"
+      production: yes
 
   - name: Delete old pm2 process
     command: pm2 delete {{ service_name }}
