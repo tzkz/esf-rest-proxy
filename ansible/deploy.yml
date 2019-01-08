@@ -21,7 +21,7 @@
       archive: yes
       recursive: yes
       delete: yes
-      src: ../../esf-rest-proxy/
+      src: "../../"
       dest: "{{ www_root }}"
       rsync_opts:
         - "--exclude=node_modules"
