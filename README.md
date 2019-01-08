@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/timurengineer/esf-rest-proxy/tree/master.svg?style=shield)](https://circleci.com/gh/timurengineer/esf-rest-proxy/tree/master)
+
 # esf-rest-proxy
 
 RESTful proxy for ESF SOAP API
