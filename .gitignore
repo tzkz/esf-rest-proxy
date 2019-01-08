@@ -1,5 +1,5 @@
 /node_modules
-/dummy_data
+/deploy_keys
 .DS_Store
 /env/config.json
 *.log
