@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  deploy-dev:
+    docker:
+      - image: circleci/python:2.7
+        environment:
+            ANSIBLE_HOST_KEY_CHECKING: no
+            ANSIBLE_REMOTE_TEMP: /home/ubuntu/.ansible/tmp
+    steps:
+      - run: sudo pip install ansible
+      - run: sudo apt install -y rsync
+      - run: ansible-playbook ./ansible/deploy.yml -i ./ansible/dev
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - deploy-dev:
+          filters:
+            branches:
+              only: master
