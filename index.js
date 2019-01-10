@@ -5,7 +5,7 @@ const cors = require('cors');
 const config = require('./config');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const wsdlOptions = {
     // overrideRootElement: {
     //     namespace: 'tns'
@@ -43,6 +43,9 @@ app.get('/api/v1/invoices/queryinvoice', (req, res) => {
       direction: req.query.direction,
       dateFrom: dateFrom.toISOString(),
       dateTo: dateTo.toISOString(),
+      invoiceStatusList: {
+        invoiceStatus: req.query.statuses
+      },
       asc: true,
     }
   }
