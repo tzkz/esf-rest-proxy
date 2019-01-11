@@ -196,13 +196,13 @@ curl -X POST "localhost:3000/sessions/closesession" \
 ### Query Invoice
 
 ```
-GET /invoices/queryinvoice?dateFrom=<YYYY-MM-DD>&dateTo=<YYYY-MM-DD>&direction=<INBOUND or OUTBOUND>
+GET /invoices/queryinvoice?dateFrom=<YYYY-MM-DD>&dateTo=<YYYY-MM-DD>&direction=<INBOUND or OUTBOUND>&statuses[]=<CREATED, DELIVERED, CANCELED, REVOKED, IMPORTED, DRAFT, FAILED, DELETED, DECLINED>
 ```
 
 #### Example Request
 
 ```
-curl -X GET "localhost:3000/invoices/queryinvoice?dateFrom=2018-12-18&dateTo=2018-12-18&direction=OUTBOUND" \
+curl -X GET "localhost:3000/invoices/queryinvoice?dateFrom=2018-12-18&dateTo=2018-12-18&direction=OUTBOUND&statuses[]=CREATED&statuses[]=DELIVERED" \
      -H "Session-ID: cf919a520f9c41d4a41f4deba060c39d-123456789011-"
 ```
 
