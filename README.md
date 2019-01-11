@@ -30,7 +30,7 @@ x509Certificate | User's X.509 certificate | Text
 
 #### Example Request
 
-```
+```sh
 curl -X POST "localhost:3000/sessions/createsession" \
      -H "Content-Type: application/json" \
      -d '{ 
@@ -42,7 +42,7 @@ curl -X POST "localhost:3000/sessions/createsession" \
 
 #### Example Response
 
-```
+```json
 {
     "sessionId": "518c8ad6b28843b29e8a41f798ff4703-123456789011-"
 }
@@ -62,7 +62,7 @@ sessionId | Session ID | Text
 
 #### Example Request
 
-```
+```sh
 curl -X POST "localhost:3000/sessions/currentuser" \
      -H "Content-Type: application/json" \
      -d '{ 
@@ -74,7 +74,7 @@ curl -X POST "localhost:3000/sessions/currentuser" \
 
 #### Example Response
 
-```
+```json
 {
     "user": {
         "login": "123456789011",
@@ -114,7 +114,7 @@ sessionId | Session ID | Text
 
 #### Example Request
 
-```
+```sh
 curl -X POST "localhost:3000/sessions/currentuserprofiles" \
      -H "Content-Type: application/json" \
      -d '{ 
@@ -126,7 +126,7 @@ curl -X POST "localhost:3000/sessions/currentuserprofiles" \
 
 #### Example Response
 
-```
+```json
 {
     "profileInfoList": {
         "profileInfo": [
@@ -173,7 +173,7 @@ sessionId | Session ID | Text
 
 #### Example Request
 
-```
+```sh
 curl -X POST "localhost:3000/sessions/closesession" \
      -H "Content-Type: application/json" \
      -d '{ 
@@ -185,7 +185,7 @@ curl -X POST "localhost:3000/sessions/closesession" \
 
 #### Example Response
 
-```
+```json
 {
     "status": "CLOSED"
 }
@@ -208,12 +208,12 @@ invoiceType (optional) | ORDINARY_INVOICE, FIXED_INVOICE or ADDITIONAL_INVOICE |
 
 #### Example Request
 
-```
+```sh
 curl -X GET "localhost:3000/invoices/queryinvoice?dateFrom=2018-12-18&dateTo=2018-12-18&direction=OUTBOUND&statuses[]=CREATED&statuses[]=DELIVERED" \
      -H "Session-ID: cf919a520f9c41d4a41f4deba060c39d-123456789011-"
 ```
 
-#### Example Restponse
+#### Example Response
 ```
 {
     "lastBlock": true,
