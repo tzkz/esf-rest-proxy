@@ -198,6 +198,13 @@ curl -X POST "localhost:3000/sessions/closesession" \
 ```
 GET /invoices/queryinvoice?dateFrom=<YYYY-MM-DD>&dateTo=<YYYY-MM-DD>&direction=<INBOUND or OUTBOUND>&statuses[]=<CREATED, DELIVERED, CANCELED, REVOKED, IMPORTED, DRAFT, FAILED, DELETED, DECLINED>
 ```
+Query Param | Description | Format
+----- | ----------- | ------
+dateFrom | A filter on the list based on Invoice Creation Date | YYYY-MM-DD
+dateTo | A filter on the list based on Invoice Creation Date | YYYY-MM-DD
+direction | INBOUND or OUTBOUND | String
+statuses[] | At least one value required: CREATED, DELIVERED, CANCELED, REVOKED, IMPORTED, DRAFT, FAILED, DELETED, DECLINED | Array
+type (optional) | ORDINARY_INVOICE, FIXED_INVOICE or ADDITIONAL_INVOICE | String
 
 #### Example Request
 
