@@ -73,7 +73,7 @@ app.post('/api/v1/sessions/createsession', (req, res) => {
   sessionSoapClient.createSession(soapReqBody, function(err, result) {
     if (err) {
       return res.status(err.response.statusCode)
-        .json({ ...err, error: err.root.Envelope.Body.Fault });
+        .json({ ...err, soapError: err.root.Envelope.Body.Fault });
     }
     res.json(result);
   }, {rejectUnauthorized: false});
