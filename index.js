@@ -26,6 +26,11 @@ const setSoapSecurity = (user, pass) => {
   })); 
 };
 
+const dateToISOString = (dateString) => {
+  const dateObj = new Date(dateString)
+  return dateObj.toISOString()
+}
+
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -35,17 +40,17 @@ app.get('/api/v1', (req, res) => {
 });
 
 app.get('/api/v1/invoices/queryinvoice', (req, res) => {
-  const dateFrom = new Date(req.query.dateFrom)
-  const dateTo = new Date(req.query.dateTo)
+  const { direction, dateFrom, dateTo, statuses, ...other } = req.query
   let soapReqBody = {
     sessionId: req.get('Session-ID'),
     criteria: {
-      direction: req.query.direction,
-      dateFrom: dateFrom.toISOString(),
-      dateTo: dateTo.toISOString(),
+      direction,
+      dateFrom: dateToISOString(dateFrom),
+      dateTo: dateToISOString(dateTo),
       invoiceStatusList: {
-        invoiceStatus: req.query.statuses
+        invoiceStatus: statuses
       },
+      ...other,
       asc: true,
     }
   }
