@@ -31,6 +31,11 @@ const dateToISOString = (dateString) => {
   return dateObj.toISOString()
 }
 
+const handleSoapError = (error, res) => {
+  return res.status(error.response.statusCode)
+    .json({ ...error, soapError: error.root.Envelope.Body.Fault });
+}
+
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -55,8 +60,12 @@ app.get('/api/v1/invoices/queryinvoice', (req, res) => {
     }
   }
 
-  invoiceSoapClient.queryInvoice(soapReqBody, (error, result) => {
-    if (error) { return res.send(error) }
+  invoiceSoapClient.queryInvoice(soapReqBody, (err, result) => {
+    if (err) {
+      return err.response
+        ? handleSoapError(err, res)
+        : res.status(500).json(err)
+    }
 
     res.json(result)
   }, {rejectUnauthorized: false})
@@ -72,8 +81,9 @@ app.post('/api/v1/sessions/createsession', (req, res) => {
 
   sessionSoapClient.createSession(soapReqBody, function(err, result) {
     if (err) {
-      return res.status(err.response.statusCode)
-        .json({ ...err, soapError: err.root.Envelope.Body.Fault });
+      return err.response
+        ? handleSoapError(err, res)
+        : res.status(500).json(err)
     }
     res.json(result);
   }, {rejectUnauthorized: false});
@@ -87,7 +97,11 @@ app.post('/api/v1/sessions/closesession', (req, res) => {
   };
 
   sessionSoapClient.closeSession(soapReqBody, function(err, result) {
-    if (err) { return res.send(err); }
+    if (err) {
+      return err.response
+        ? handleSoapError(err, res)
+        : res.status(500).json(err)
+    }
     res.json(result);
   }, {rejectUnauthorized: false});
 });
@@ -100,7 +114,11 @@ app.post('/api/v1/sessions/currentuser', (req, res) => {
   };
 
   sessionSoapClient.currentUser(soapReqBody, function(err, result) {
-    if (err) { return res.send(err); }
+    if (err) {
+      return err.response
+        ? handleSoapError(err, res)
+        : res.status(500).json(err)
+    }
     res.json(result);
   }, {rejectUnauthorized: false});
 });
@@ -113,7 +131,11 @@ app.post('/api/v1/sessions/currentuserprofiles', (req, res) => {
   };
 
   sessionSoapClient.currentUserProfiles(soapReqBody, function(err, result) {
-    if (err) { return res.send(err); }
+    if (err) {
+      return err.response
+        ? handleSoapError(err, res)
+        : res.status(500).json(err)
+    }
     res.json(result);
   }, {rejectUnauthorized: false});
 });
