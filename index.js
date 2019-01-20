@@ -3,6 +3,17 @@ const soap = require('soap');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const config = require('./config');
+const Jsonix = require('jsonix').Jsonix
+const mappingInvoiceV2 = require('./mappings/invoiceV2').PO;
+
+const context = new Jsonix.Context([mappingInvoiceV2]);
+const unmarshaller = context.createUnmarshaller();
+
+const parseInvoiceBody = (item) => new Promise((resolve) => {
+  console.log('parsing invoice body:', item.invoiceBody)
+  const invoice = unmarshaller.unmarshalString(item.invoiceBody).value
+  resolve({ ...item, invoice })
+})
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -67,7 +78,16 @@ app.get('/api/v1/invoices/queryinvoice', (req, res) => {
         : res.status(500).json(err)
     }
 
-    res.json(result)
+    if (result.invoiceInfoList.invoiceInfo) {
+      Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
+        .then((invoiceInfo) => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
+        .catch((error) => {
+          console.log(error);
+          res.status(500).json(error)
+        })
+    } else {
+      res.json(result)
+    }
   }, {rejectUnauthorized: false})
 });
 
