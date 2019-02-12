@@ -51,11 +51,11 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-app.get('/api/v1', (req, res) => {
+app.get('/v1', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/api/v1/invoices/queryinvoice', (req, res) => {
+app.get('/v1/invoices/queryinvoice', (req, res) => {
   const { direction, dateFrom, dateTo, statuses, ...other } = req.query
   let soapReqBody = {
     sessionId: req.get('Session-ID'),
@@ -91,7 +91,7 @@ app.get('/api/v1/invoices/queryinvoice', (req, res) => {
   }, {rejectUnauthorized: false})
 });
 
-app.post('/api/v1/sessions/createsession', (req, res) => {
+app.post('/v1/sessions/createsession', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
  
   let soapReqBody = {
@@ -109,7 +109,7 @@ app.post('/api/v1/sessions/createsession', (req, res) => {
   }, {rejectUnauthorized: false});
 });
 
-app.post('/api/v1/sessions/closesession', (req, res) => {
+app.post('/v1/sessions/closesession', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
  
   let soapReqBody = {
@@ -126,7 +126,7 @@ app.post('/api/v1/sessions/closesession', (req, res) => {
   }, {rejectUnauthorized: false});
 });
 
-app.post('/api/v1/sessions/currentuser', (req, res) => {
+app.post('/v1/sessions/currentuser', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
 
   let soapReqBody = {
@@ -143,7 +143,7 @@ app.post('/api/v1/sessions/currentuser', (req, res) => {
   }, {rejectUnauthorized: false});
 });
 
-app.post('/api/v1/sessions/currentuserprofiles', (req, res) => {
+app.post('/v1/sessions/currentuserprofiles', (req, res) => {
   setSoapSecurity(req.body.username, req.body.password);
 
   let soapReqBody = {
