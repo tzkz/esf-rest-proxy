@@ -2,7 +2,7 @@
 
 # esf-rest-proxy
 
-RESTful proxy for ESF SOAP API
+RESTful proxy for ESF SOAP API. Used by Web Client: https://github.com/timurengineer/esf-web-client
 
 Original WSDLs: https://testvs.kgd.gov.kz:8443/esf-web/ws/api1/
 
