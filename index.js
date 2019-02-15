@@ -78,7 +78,7 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
         : res.status(500).json(err)
     }
 
-    if (result.invoiceInfoList.invoiceInfo) {
+    if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
       Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
         .then((invoiceInfo) => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
         .catch((error) => {
