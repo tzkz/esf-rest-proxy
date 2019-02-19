@@ -6,6 +6,17 @@ RESTful proxy for ESF SOAP API. Used by Web Client: https://github.com/timurengi
 
 Original WSDLs: https://testvs.kgd.gov.kz:8443/esf-web/ws/api1/
 
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Session Service](#session-service)
+    - [Create Session](#create-session)
+    - [Current User](#current-user)
+    - [Current User Profiles](#current-user-profiles)
+    - [Close Session](#close-session)
+- [Invoice Service](#invoice-service)
+    - [Query Invoice](#query-invoice)
+
 ## Quick Start
 
 ```
