@@ -17,16 +17,7 @@ const parseInvoiceBody = (item) => new Promise((resolve) => {
 
 const app = express();
 const port = process.env.PORT || 3001;
-const wsdlOptions = {
-    // overrideRootElement: {
-    //     namespace: 'tns'
-    // },
-    // ignoredNamespaces: {
-    //   namespaces: [],
-    //   override: true
-    // },
-    // ignoreBaseNameSpaces: false
-};
+const wsdlOptions = {};
 let invoiceSoapClient = null;
 let sessionSoapClient = null;
 
