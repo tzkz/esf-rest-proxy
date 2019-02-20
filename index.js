@@ -151,7 +151,7 @@ app.post('/v1/sessions/currentuserprofiles', (req, res) => {
   }, {rejectUnauthorized: false})
 })
 
-let p1 = new Promise((resolve, reject) => {
+let createInvoiceClient = () => new Promise((resolve, reject) => {
   soap.createClient(config.invoiceWsdl, wsdlOptions, function(err, cl) {
     if (err) {
       reject(err)
@@ -161,7 +161,7 @@ let p1 = new Promise((resolve, reject) => {
   })
 })
 
-let p2 = new Promise((resolve, reject) => {
+let createSessionClient = () => new Promise((resolve, reject) => {
   soap.createClient(config.sessionWsdl, wsdlOptions, function(err, cl) {
     if (err) { throw err }
     console.log('SessionService SOAP client loaded.')
@@ -169,7 +169,7 @@ let p2 = new Promise((resolve, reject) => {
   })
 })
 
-Promise.all([p1, p2])
+Promise.all([createInvoiceClient(), createSessionClient()])
   .then((values) => {
     invoiceSoapClient = values[0]
     sessionSoapClient = values[1]
