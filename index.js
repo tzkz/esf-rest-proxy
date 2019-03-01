@@ -43,8 +43,13 @@ const dateToISOString = (dateString) => {
   return dateObj.toISOString()
 }
 
-const handleSoapError = (error, res) => res.status(error.response.statusCode)
-  .json({ ...error, soapError: error.root.Envelope.Body.Fault })
+const getStatus = ({ response }) => (response ? response.statusCode : 500)
+
+const getJson = error => (
+  error.response
+    ? { ...error, soapError: error.root.Envelope.Body.Fault }
+    : error
+)
 
 app.use(cors())
 app.use(bodyParser.json({ limit: '50mb' }))
@@ -63,9 +68,7 @@ app.post('/v1/sessions/createsession', (req, res) => {
 
   sessionService('createSession', { username, password, body })
     .then(result => res.json(result))
-    .catch(error => (
-      error.response ? handleSoapError(error, res) : res.status(500).json(error)
-    ))
+    .catch(error => res.status(getStatus(error)).json(getJson(error)))
 })
 
 app.post('/v1/sessions/closesession', (req, res) => {
@@ -74,9 +77,7 @@ app.post('/v1/sessions/closesession', (req, res) => {
 
   sessionService('closeSession', { username, password, body })
     .then(result => res.json(result))
-    .catch(error => (
-      error.response ? handleSoapError(error, res) : res.status(500).json(error)
-    ))
+    .catch(error => res.status(getStatus(error)).json(getJson(error)))
 })
 
 app.post('/v1/sessions/currentuser', (req, res) => {
@@ -85,9 +86,7 @@ app.post('/v1/sessions/currentuser', (req, res) => {
 
   sessionService('currentUser', { username, password, body })
     .then(result => res.json(result))
-    .catch(error => (
-      error.response ? handleSoapError(error, res) : res.status(500).json(error)
-    ))
+    .catch(error => res.status(getStatus(error)).json(getJson(error)))
 })
 
 app.post('/v1/sessions/currentuserprofiles', (req, res) => {
@@ -96,9 +95,7 @@ app.post('/v1/sessions/currentuserprofiles', (req, res) => {
 
   sessionService('currentUserProfiles', { username, password, body })
     .then(result => res.json(result))
-    .catch(error => (
-      error.response ? handleSoapError(error, res) : res.status(500).json(error)
-    ))
+    .catch(error => res.status(getStatus(error)).json(getJson(error)))
 })
 
 app.get('/v1/invoices/queryinvoice', (req, res) => {
@@ -121,9 +118,7 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
 
   invoiceSoapClient.queryInvoice(soapReqBody, (err, result) => {
     if (err) {
-      return err.response
-        ? handleSoapError(err, res)
-        : res.status(500).json(err)
+      return res.status(getStatus(err)).json(getJson(err))
     }
 
     if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
