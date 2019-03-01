@@ -22,12 +22,21 @@ const wsdlOptions = {}
 let invoiceSoapClient = null
 let sessionSoapClient = null
 
-const setSoapSecurity = (user, pass) => {
-  sessionSoapClient.setSecurity(new soap.WSSecurity(user, pass, {
+const sessionService = (method, options) => new Promise((resolve, reject) => {
+  const { username, password, body } = options
+
+  sessionSoapClient.setSecurity(new soap.WSSecurity(username, password, {
     hasTimeStamp: false,
     hasTokenCreated: false,
   }))
-}
+
+  sessionSoapClient[method](body, (error, result) => {
+    if (error) {
+      reject(error)
+    }
+    resolve(result)
+  }, { rejectUnauthorized: false })
+})
 
 const dateToISOString = (dateString) => {
   const dateObj = new Date(dateString)
@@ -43,6 +52,53 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 app.get('/v1', (req, res) => {
   res.send('Hello World!')
+})
+
+app.post('/v1/sessions/createsession', (req, res) => {
+  const { username, password, x509Certificate } = req.body
+  const body = {
+    tin: username,
+    x509Certificate,
+  }
+
+  sessionService('createSession', { username, password, body })
+    .then(result => res.json(result))
+    .catch(error => (
+      error.response ? handleSoapError(error, res) : res.status(500).json(error)
+    ))
+})
+
+app.post('/v1/sessions/closesession', (req, res) => {
+  const { username, password, sessionId } = req.body
+  const body = { sessionId }
+
+  sessionService('closeSession', { username, password, body })
+    .then(result => res.json(result))
+    .catch(error => (
+      error.response ? handleSoapError(error, res) : res.status(500).json(error)
+    ))
+})
+
+app.post('/v1/sessions/currentuser', (req, res) => {
+  const { username, password, sessionId } = req.body
+  const body = { sessionId }
+
+  sessionService('currentUser', { username, password, body })
+    .then(result => res.json(result))
+    .catch(error => (
+      error.response ? handleSoapError(error, res) : res.status(500).json(error)
+    ))
+})
+
+app.post('/v1/sessions/currentuserprofiles', (req, res) => {
+  const { username, password, sessionId } = req.body
+  const body = { sessionId }
+
+  sessionService('currentUserProfiles', { username, password, body })
+    .then(result => res.json(result))
+    .catch(error => (
+      error.response ? handleSoapError(error, res) : res.status(500).json(error)
+    ))
 })
 
 app.get('/v1/invoices/queryinvoice', (req, res) => {
@@ -81,106 +137,31 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
   }, { rejectUnauthorized: false })
 })
 
-app.post('/v1/sessions/createsession', (req, res) => {
-  setSoapSecurity(req.body.username, req.body.password)
-
-  const soapReqBody = {
-    tin: req.body.username,
-    x509Certificate: req.body.x509Certificate,
-  }
-
-  sessionSoapClient.createSession(soapReqBody, (err, result) => {
-    if (err) {
-      return err.response
-        ? handleSoapError(err, res)
-        : res.status(500).json(err)
+const createSoapClient = (name, options) => new Promise((resolve, reject) => {
+  soap.createClient(config.wsdl[name], options, (error, client) => {
+    if (error) {
+      reject(error)
     }
-
-    return res.json(result)
-  }, { rejectUnauthorized: false })
-})
-
-app.post('/v1/sessions/closesession', (req, res) => {
-  setSoapSecurity(req.body.username, req.body.password)
-
-  const soapReqBody = {
-    sessionId: req.body.sessionId,
-  }
-
-  sessionSoapClient.closeSession(soapReqBody, (err, result) => {
-    if (err) {
-      return err.response
-        ? handleSoapError(err, res)
-        : res.status(500).json(err)
-    }
-
-    return res.json(result)
-  }, { rejectUnauthorized: false })
-})
-
-app.post('/v1/sessions/currentuser', (req, res) => {
-  setSoapSecurity(req.body.username, req.body.password)
-
-  const soapReqBody = {
-    sessionId: req.body.sessionId,
-  }
-
-  sessionSoapClient.currentUser(soapReqBody, (err, result) => {
-    if (err) {
-      return err.response
-        ? handleSoapError(err, res)
-        : res.status(500).json(err)
-    }
-
-    return res.json(result)
-  }, { rejectUnauthorized: false })
-})
-
-app.post('/v1/sessions/currentuserprofiles', (req, res) => {
-  setSoapSecurity(req.body.username, req.body.password)
-
-  const soapReqBody = {
-    sessionId: req.body.sessionId,
-  }
-
-  sessionSoapClient.currentUserProfiles(soapReqBody, (err, result) => {
-    if (err) {
-      return err.response
-        ? handleSoapError(err, res)
-        : res.status(500).json(err)
-    }
-
-    return res.json(result)
-  }, { rejectUnauthorized: false })
-})
-
-const createInvoiceClient = () => new Promise((resolve, reject) => {
-  soap.createClient(config.invoiceWsdl, wsdlOptions, (err, cl) => {
-    if (err) {
-      reject(err)
-    }
-    console.log('InvoiceService SOAP client loaded.') // eslint-disable-line no-console
-    resolve(cl)
+    console.log(`${name} SOAP client has been created`) // eslint-disable-line no-console
+    resolve(client)
   })
 })
 
-const createSessionClient = () => new Promise((resolve) => {
-  soap.createClient(config.sessionWsdl, wsdlOptions, (err, cl) => {
-    if (err) { throw err }
-    console.log('SessionService SOAP client loaded.') // eslint-disable-line no-console
-    resolve(cl)
-  })
-})
+const startApp = ([invoiceClient, sessionClient]) => {
+  invoiceSoapClient = invoiceClient
+  sessionSoapClient = sessionClient
 
-Promise.all([createInvoiceClient(), createSessionClient()])
-  .then(([invoiceClient, sessionClient]) => {
-    invoiceSoapClient = invoiceClient
-    sessionSoapClient = sessionClient
-    app.listen(port, () => {
-      app.emit('appStarted')
-      console.log('Listening on port:', port) // eslint-disable-line no-console
-    })
+  app.listen(port, () => {
+    app.emit('appStarted')
+    console.log('Listening on port:', port) // eslint-disable-line no-console
   })
+}
+
+Promise.all([
+  createSoapClient('invoice', wsdlOptions),
+  createSoapClient('session', wsdlOptions),
+])
+  .then(startApp)
   .catch((error) => {
     throw error
   })
