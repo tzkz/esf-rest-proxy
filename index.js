@@ -2,16 +2,17 @@ const express = require('express')
 const soap = require('soap')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const { Jsonix } = require('jsonix')
+
 const config = require('./config')
-const Jsonix = require('jsonix').Jsonix
 const mappingInvoiceV2 = require('./mappings/invoiceV2').PO
 
 const context = new Jsonix.Context([mappingInvoiceV2])
 const unmarshaller = context.createUnmarshaller()
 
 const parseInvoiceBody = item => new Promise((resolve) => {
-  console.log('parsing invoice body:', item.invoiceBody)
   const invoice = unmarshaller.unmarshalString(item.invoiceBody).value
+
   resolve({ ...item, invoice })
 })
 
@@ -70,15 +71,13 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
     }
 
     if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
-      Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
+      return Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
         .then(invoiceInfo => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
         .catch((error) => {
-          console.log(error)
           res.status(500).json(error)
         })
-    } else {
-      res.json(result)
     }
+    return res.json(result)
   }, { rejectUnauthorized: false })
 })
 
@@ -96,7 +95,8 @@ app.post('/v1/sessions/createsession', (req, res) => {
         ? handleSoapError(err, res)
         : res.status(500).json(err)
     }
-    res.json(result)
+
+    return res.json(result)
   }, { rejectUnauthorized: false })
 })
 
@@ -113,7 +113,8 @@ app.post('/v1/sessions/closesession', (req, res) => {
         ? handleSoapError(err, res)
         : res.status(500).json(err)
     }
-    res.json(result)
+
+    return res.json(result)
   }, { rejectUnauthorized: false })
 })
 
@@ -130,7 +131,8 @@ app.post('/v1/sessions/currentuser', (req, res) => {
         ? handleSoapError(err, res)
         : res.status(500).json(err)
     }
-    res.json(result)
+
+    return res.json(result)
   }, { rejectUnauthorized: false })
 })
 
@@ -147,7 +149,8 @@ app.post('/v1/sessions/currentuserprofiles', (req, res) => {
         ? handleSoapError(err, res)
         : res.status(500).json(err)
     }
-    res.json(result)
+
+    return res.json(result)
   }, { rejectUnauthorized: false })
 })
 
@@ -156,26 +159,26 @@ const createInvoiceClient = () => new Promise((resolve, reject) => {
     if (err) {
       reject(err)
     }
-    console.log('InvoiceService SOAP client loaded.')
+    console.log('InvoiceService SOAP client loaded.') // eslint-disable-line no-console
     resolve(cl)
   })
 })
 
-const createSessionClient = () => new Promise((resolve, reject) => {
+const createSessionClient = () => new Promise((resolve) => {
   soap.createClient(config.sessionWsdl, wsdlOptions, (err, cl) => {
     if (err) { throw err }
-    console.log('SessionService SOAP client loaded.')
+    console.log('SessionService SOAP client loaded.') // eslint-disable-line no-console
     resolve(cl)
   })
 })
 
 Promise.all([createInvoiceClient(), createSessionClient()])
-  .then((values) => {
-    invoiceSoapClient = values[0]
-    sessionSoapClient = values[1]
+  .then(([invoiceClient, sessionClient]) => {
+    invoiceSoapClient = invoiceClient
+    sessionSoapClient = sessionClient
     app.listen(port, () => {
       app.emit('appStarted')
-      console.log('Listening on port:', port)
+      console.log('Listening on port:', port) // eslint-disable-line no-console
     })
   })
   .catch((error) => {
