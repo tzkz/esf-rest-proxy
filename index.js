@@ -101,7 +101,6 @@ const startApp = ([invoiceService, sessionService]) => {
   })
 
   app.listen(port, () => {
-    app.emit('appStarted')
     console.log('Listening on port:', port) // eslint-disable-line no-console
   })
 }
