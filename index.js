@@ -1,19 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const { Jsonix } = require('jsonix')
 
 const createService = require('./soapService')
-const mappingInvoiceV2 = require('./mappings/invoiceV2').PO
-
-const context = new Jsonix.Context([mappingInvoiceV2])
-const unmarshaller = context.createUnmarshaller()
-
-const parseInvoiceBody = item => new Promise((resolve) => {
-  const invoice = unmarshaller.unmarshalString(item.invoiceBody).value
-
-  resolve({ ...item, invoice })
-})
+const parseInvoiceBody = require('./xmlParser')
 
 const app = express()
 const port = process.env.PORT || 3001
