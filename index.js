@@ -126,27 +126,35 @@ const createSoapClient = (name, options) => new Promise((resolve, reject) => {
   })
 })
 
-const createSessionService = client => (
-  (method, options) => new Promise((resolve, reject) => {
-    const { username, password, body } = options
+const createService = (name, options) => new Promise((resolveService, rejectService) => {
+  soap.createClient(config.wsdl[name], options, (errorService, client) => {
+    if (errorService) {
+      rejectService(errorService)
+    }
+    console.log(`${name} SOAP client has been created`) // eslint-disable-line no-console
+    resolveService((method, requestOptions) => new Promise((resolve, reject) => {
+      const { username, password, body } = requestOptions
 
-    client.setSecurity(new soap.WSSecurity(username, password, {
-      hasTimeStamp: false,
-      hasTokenCreated: false,
-    }))
-
-    client[method](body, (error, result) => {
-      if (error) {
-        reject(error)
+      if (name === 'session') {
+        client.setSecurity(new soap.WSSecurity(username, password, {
+          hasTimeStamp: false,
+          hasTokenCreated: false,
+        }))
       }
-      resolve(result)
-    }, { rejectUnauthorized: false })
-  })
-)
 
-const startApp = ([invoiceClient, sessionClient]) => {
+      client[method](body, (error, result) => {
+        if (error) {
+          reject(error)
+        }
+        resolve(result)
+      }, { rejectUnauthorized: false })
+    }))
+  })
+})
+
+const startApp = ([invoiceClient, session]) => {
   invoiceSoapClient = invoiceClient
-  sessionService = createSessionService(sessionClient)
+  sessionService = session
 
   app.listen(port, () => {
     app.emit('appStarted')
@@ -156,7 +164,7 @@ const startApp = ([invoiceClient, sessionClient]) => {
 
 Promise.all([
   createSoapClient('invoice', wsdlOptions),
-  createSoapClient('session', wsdlOptions),
+  createService('session', wsdlOptions),
 ])
   .then(startApp)
   .catch((error) => {
