@@ -19,7 +19,7 @@ const parseInvoiceBody = item => new Promise((resolve) => {
 const app = express()
 const port = process.env.PORT || 3001
 const wsdlOptions = {}
-let invoiceSoapClient = null
+let invoiceService = null
 let sessionService = null
 
 const dateToISOString = (dateString) => {
@@ -86,7 +86,7 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
   const {
     direction, dateFrom, dateTo, statuses, ...other
   } = req.query
-  const soapReqBody = {
+  const body = {
     sessionId: req.get('Session-ID'),
     criteria: {
       direction,
@@ -100,30 +100,18 @@ app.get('/v1/invoices/queryinvoice', (req, res) => {
     },
   }
 
-  invoiceSoapClient.queryInvoice(soapReqBody, (err, result) => {
-    if (err) {
-      return res.status(getStatus(err)).json(getJson(err))
-    }
-
-    if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
-      return Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
-        .then(invoiceInfo => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
-        .catch((error) => {
-          res.status(500).json(error)
-        })
-    }
-    return res.json(result)
-  }, { rejectUnauthorized: false })
-})
-
-const createSoapClient = (name, options) => new Promise((resolve, reject) => {
-  soap.createClient(config.wsdl[name], options, (error, client) => {
-    if (error) {
-      reject(error)
-    }
-    console.log(`${name} SOAP client has been created`) // eslint-disable-line no-console
-    resolve(client)
-  })
+  invoiceService('queryInvoice', { body })
+    .then((result) => {
+      if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
+        return Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
+          .then(invoiceInfo => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
+          .catch((error) => {
+            res.status(500).json(error)
+          })
+      }
+      return res.json(result)
+    })
+    .catch(error => res.status(getStatus(error)).json(getJson(error)))
 })
 
 const createService = (name, options) => new Promise((resolveService, rejectService) => {
@@ -152,8 +140,8 @@ const createService = (name, options) => new Promise((resolveService, rejectServ
   })
 })
 
-const startApp = ([invoiceClient, session]) => {
-  invoiceSoapClient = invoiceClient
+const startApp = ([invoice, session]) => {
+  invoiceService = invoice
   sessionService = session
 
   app.listen(port, () => {
@@ -163,7 +151,7 @@ const startApp = ([invoiceClient, session]) => {
 }
 
 Promise.all([
-  createSoapClient('invoice', wsdlOptions),
+  createService('invoice', wsdlOptions),
   createService('session', wsdlOptions),
 ])
   .then(startApp)
