@@ -20,23 +20,7 @@ const app = express()
 const port = process.env.PORT || 3001
 const wsdlOptions = {}
 let invoiceSoapClient = null
-let sessionSoapClient = null
-
-const sessionService = (method, options) => new Promise((resolve, reject) => {
-  const { username, password, body } = options
-
-  sessionSoapClient.setSecurity(new soap.WSSecurity(username, password, {
-    hasTimeStamp: false,
-    hasTokenCreated: false,
-  }))
-
-  sessionSoapClient[method](body, (error, result) => {
-    if (error) {
-      reject(error)
-    }
-    resolve(result)
-  }, { rejectUnauthorized: false })
-})
+let sessionService = null
 
 const dateToISOString = (dateString) => {
   const dateObj = new Date(dateString)
@@ -142,9 +126,27 @@ const createSoapClient = (name, options) => new Promise((resolve, reject) => {
   })
 })
 
+const createSessionService = client => (
+  (method, options) => new Promise((resolve, reject) => {
+    const { username, password, body } = options
+
+    client.setSecurity(new soap.WSSecurity(username, password, {
+      hasTimeStamp: false,
+      hasTokenCreated: false,
+    }))
+
+    client[method](body, (error, result) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(result)
+    }, { rejectUnauthorized: false })
+  })
+)
+
 const startApp = ([invoiceClient, sessionClient]) => {
   invoiceSoapClient = invoiceClient
-  sessionSoapClient = sessionClient
+  sessionService = createSessionService(sessionClient)
 
   app.listen(port, () => {
     app.emit('appStarted')
