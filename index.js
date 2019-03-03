@@ -100,9 +100,7 @@ const startApp = ([invoiceService, sessionService]) => {
       .catch(error => res.status(getStatus(error)).json(getJson(error)))
   })
 
-  app.listen(port, () => {
-    console.log('Listening on port:', port) // eslint-disable-line no-console
-  })
+  app.listen(port, () => console.log('Listening on port:', port)) // eslint-disable-line no-console
 }
 
 Promise.all([
