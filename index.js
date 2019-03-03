@@ -23,7 +23,6 @@ const getJson = error => (
 
 app.use(cors())
 app.use(bodyParser.json({ limit: '50mb' }))
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const startApp = ([invoiceService, sessionService]) => {
   app.get('/v1', (req, res) => {
