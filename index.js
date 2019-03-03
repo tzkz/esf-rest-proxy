@@ -3,15 +3,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const createService = require('./soapService')
-const parseInvoiceBody = require('./xmlParser')
+const parseXml = require('./xmlParser')
 
 const app = express()
 const port = process.env.PORT || 3001
-
-const dateToISOString = (dateString) => {
-  const dateObj = new Date(dateString)
-  return dateObj.toISOString()
-}
 
 const getStatus = ({ response }) => (response ? response.statusCode : 500)
 
@@ -24,7 +19,7 @@ const getJson = error => (
 app.use(cors())
 app.use(bodyParser.json({ limit: '50mb' }))
 
-const startApp = ([invoiceService, sessionService]) => {
+const initializeApp = ([invoiceService, sessionService]) => {
   app.get('/v1', (req, res) => {
     res.send('Hello World!')
   })
@@ -76,8 +71,8 @@ const startApp = ([invoiceService, sessionService]) => {
       sessionId: req.get('Session-ID'),
       criteria: {
         direction,
-        dateFrom: dateToISOString(dateFrom),
-        dateTo: dateToISOString(dateTo),
+        dateFrom: (new Date(dateFrom)).toISOString(),
+        dateTo: (new Date(dateTo)).toISOString(),
         invoiceStatusList: {
           invoiceStatus: statuses,
         },
@@ -87,16 +82,8 @@ const startApp = ([invoiceService, sessionService]) => {
     }
 
     invoiceService('queryInvoice', { body })
-      .then((result) => {
-        if (result.invoiceInfoList && result.invoiceInfoList.invoiceInfo) {
-          return Promise.all(result.invoiceInfoList.invoiceInfo.map(parseInvoiceBody))
-            .then(invoiceInfo => res.json({ ...result, invoiceInfoList: { invoiceInfo } }))
-            .catch((error) => {
-              res.status(500).json(error)
-            })
-        }
-        return res.json(result)
-      })
+      .then(parseXml)
+      .then(result => res.json(result))
       .catch(error => res.status(getStatus(error)).json(getJson(error)))
   })
 
@@ -107,7 +94,7 @@ Promise.all([
   createService('invoice'),
   createService('session'),
 ])
-  .then(startApp)
+  .then(initializeApp)
   .catch((error) => {
     throw error
   })
